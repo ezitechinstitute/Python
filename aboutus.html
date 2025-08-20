@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About Us - Ezitech Interview Bot</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #00d9ff;
+        --secondary-color: #2c5364;
+        --dark-bg: #0a192f;
+        --light-bg: #172a45;
+        --text-light: #ccd6f6;
+        --text-lighter: #e6f1ff;
+        --accent-color: #64ffda;
+        --error-color: #ff6b6b;
+        --ezitech-blue: #1a73e8;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--dark-bg);
+        color: var(--text-light);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.6;
+        padding-top: 70px; /* To account for fixed navbar */
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 700;
+      }
+
+      /* Navbar Styles - Exact copy from main page */
+      .navbar {
+        background-color: var(--dark-bg);
+        border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+        padding: 15px 0;
+        transition: all 0.3s ease;
+      }
+
+      .navbar.scrolled {
+        padding: 10px 0;
+        background-color: rgba(10, 25, 47, 0.95);
+        backdrop-filter: blur(10px);
+      }
+
+      .navbar-brand {
+        color: var(--accent-color) !important;
+        font-weight: 700;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .navbar-brand:hover {
+        text-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
+      }
+
+      .nav-link {
+        color: var(--text-light) !important;
+        font-weight: 500;
+        padding: 8px 15px !important;
+        margin: 0 5px;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link::before {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: var(--accent-color);
+        transition: width 0.3s ease;
+      }
+
+      .nav-link:hover {
+        color: var(--accent-color) !important;
+      }
+
+      .nav-link:hover::before {
+        width: 100%;
+      }
+
+      .nav-link.active {
+        color: var(--accent-color) !important;
+      }
+
+      .nav-link.active::before {
+        width: 100%;
+      }
+
+      .navbar-toggler {
+        border: none;
+        color: var(--text-light);
+        font-size: 1.5rem;
+      }
+
+      .navbar-toggler:focus {
+        box-shadow: none;
+      }
+
+      /* About Page Content Styles */
+      .about-section {
+        padding: 100px 0;
+        background: linear-gradient(
+          135deg,
+          var(--dark-bg) 0%,
+          var(--light-bg) 100%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+
+      .about-section::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(100, 255, 218, 0.05) 0%,
+          transparent 70%
+        );
+        animation: pulse 15s infinite linear;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .about-container {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .about-header {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .about-header h1 {
+        color: var(--accent-color);
+        position: relative;
+        display: inline-block;
+        margin-bottom: 20px;
+      }
+
+      .about-header h1::after {
+        content: "";
+        position: absolute;
+        width: 60%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-color), transparent);
+        bottom: -10px;
+        left: 20%;
+      }
+
+      .about-header .logo {
+        font-size: 3rem;
+        color: var(--accent-color);
+        margin-bottom: 20px;
+      }
+
+      .story-section {
+        background: rgba(23, 42, 69, 0.8);
+        border-radius: 15px;
+        padding: 40px;
+        border: 1px solid rgba(100, 255, 218, 0.15);
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(5px);
+        margin-bottom: 40px;
+      }
+
+      .story-timeline {
+        position: relative;
+        padding-left: 30px;
+      }
+
+      .story-timeline::before {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--accent-color);
+      }
+
+      .timeline-item {
+        position: relative;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+      }
+
+      .timeline-item:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+      }
+
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -30px;
+        top: 5px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        border: 3px solid var(--light-bg);
+      }
+
+      .timeline-date {
+        color: var(--accent-color);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .team-section {
+        margin-top: 60px;
+      }
+
+      .team-card {
+        background: rgba(23, 42, 69, 0.8);
+        border-radius: 15px;
+        padding: 30px;
+        border: 1px solid rgba(100, 255, 218, 0.15);
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s ease;
+        height: 100%;
+      }
+
+      .team-card:hover {
+        border-color: rgba(100, 255, 218, 0.3);
+        box-shadow: 0 25px 40px rgba(0, 0, 0, 0.4);
+        transform: translateY(-5px);
+      }
+
+      .team-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--accent-color);
+        margin: 0 auto 20px;
+        display: block;
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .social-links a {
+        color: var(--text-light);
+        margin: 0 10px;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+      }
+
+      .social-links a:hover {
+        color: var(--accent-color);
+        transform: translateY(-3px);
+      }
+
+      .admin-footer {
+        text-align: center;
+        padding: 20px;
+        background: var(--dark-bg);
+        color: var(--text-light);
+        border-top: 1px solid rgba(100, 255, 218, 0.1);
+        font-size: 0.9rem;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--dark-bg);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--ezitech-blue);
+        border-radius: 5px;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .about-section {
+          padding: 60px 0;
+        }
+
+        .story-section {
+          padding: 30px 20px;
+        }
+
+        .navbar-collapse {
+          background-color: var(--light-bg);
+          padding: 15px;
+          border-radius: 8px;
+          margin-top: 10px;
+        }
+
+        body {
+          padding-top: 60px;
+        }
+      }
+      .whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  color: #25d366;
+  font-size: 32px;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.2);
+  color: #1ebe5d;
+}
+    </style>
+  </head>
+
+  <body>
+    <!-- Navigation - Exact copy from main page -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="/"
+          ><i class="fas fa-robot me-2"></i>Ezitech Interview Bot</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+              <a class="nav-link" href="index.html">
+                <i class="fas fa-home me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="aboutus.html">About Us</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="resume.html">Upload Resume</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/emotion">Emotion AI</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/video">Live Interview</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="admin_login.html">Admin Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- About Section -->
+    <section class="about-section">
+      <div class="about-container">
+        <div class="about-header" data-aos="fade-up">
+          <div class="logo">
+            <i class="fas fa-lightbulb"></i>
+          </div>
+          <h1>Our Story</h1>
+          <p>How the Ezitech Interview Bot was born</p>
+        </div>
+
+        <div class="story-section" data-aos="fade-up" data-aos-delay="100">
+          <div class="story-timeline">
+            <div class="timeline-item">
+              <div class="timeline-date">2023</div>
+              <h3>The Hiring Challenge</h3>
+              <p>
+                As the founder of my own software house, I found myself spending
+                countless hours interviewing candidates. The process was
+                time-consuming and often inefficient, with many candidates not
+                being the right fit despite looking good on paper.
+              </p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">Early 2024</div>
+              <h3>The "Aha!" Moment</h3>
+              <p>
+                After yet another marathon interview session, I realized I
+                needed a better way to screen candidates before the live
+                interview. That's when the idea struck me - why not create an
+                AI-powered chatbot that could conduct initial interviews for me?
+              </p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">Mid 2024</div>
+              <h3>Building the First Prototype</h3>
+              <p>
+                I started developing a simple chatbot that could ask technical
+                questions and evaluate responses. The initial version used basic
+                NLP to understand candidate answers and could assess fundamental
+                technical skills.
+              </p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">Late 2024</div>
+              <h3>Adding Emotion AI</h3>
+              <p>
+                Recognizing that technical skills weren't everything, I
+                integrated emotion recognition to analyze candidates' facial
+                expressions and tone during video responses. This helped assess
+                communication skills and cultural fit.
+              </p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">2025</div>
+              <h3>Ezitech Interview Bot is Born</h3>
+              <p>
+                After months of refinement and testing with real candidates, the
+                system proved so effective that I decided to productize it. What
+                began as a personal tool for my software house is now helping
+                other tech leaders streamline their hiring process.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-section" data-aos="fade-up">
+          <h2 class="text-center mb-5">Meet the Founder</h2>
+          <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="team-card">
+                <img src="P1.jpg" alt="Founder" class="team-img" />
+                <h3 class="text-center">Uzaif Arif</h3>
+                <p class="text-center text-muted">Founder & Lead Developer</p>
+                <p class="text-center">
+                  Software engineer turned entrepreneur with a passion for
+                  building tools that solve real problems.
+                </p>
+                <div class="social-links">
+                  <a href="#"><i class="fab fa-linkedin"></i></a>
+                  <a href="#"><i class="fab fa-github"></i></a>
+                  <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="admin-footer">
+      <div class="container">
+        <p>&copy; 2025 Ezitech Interview Bot. All rights reserved.</p>
+        <p class="text-muted">
+          Transforming the hiring process one interview at a time.
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+      // Initialize AOS animations
+      AOS.init({
+        once: true,
+        duration: 800,
+        easing: "ease-out-quart",
+      });
+
+      // Navbar scroll effect
+      window.addEventListener("scroll", function () {
+        const navbar = document.querySelector(".navbar");
+        if (window.scrollY > 50) {
+          navbar.classList.add("scrolled");
+        } else {
+          navbar.classList.remove("scrolled");
+        }
+      });
+
+      // Highlight active nav item
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentPage = location.pathname;
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          if (link.getAttribute("href") === currentPage) {
+            link.classList.add("active");
+          }
+        });
+      });
+    </script>
+     <!-- Floating WhatsApp Button -->
+<a href="https://wa.me/+923175091234" class="whatsapp-float" target="_blank" rel="noopener">
+  <i class="fab fa-whatsapp"></i>
+</a>
+  </body>
+</html>

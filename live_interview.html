@@ -1,0 +1,878 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid interview-container">
+    <div class="row g-0">
+        <!-- Left Sidebar -->
+        <div class="col-md-3 sidebar">
+            <div class="d-flex flex-column h-100">
+                <div class="sidebar-header p-3">
+                    <h5 class="mb-0">InterviewConnect</h5>
+                    <small class="text-muted">AI-Powered Interviews</small>
+                </div>
+                
+                <div class="sidebar-content flex-grow-1 p-3">
+                    <!-- Setup Form -->
+                    <div id="setupForm">
+                        <h6 class="sidebar-title mb-3">Candidate Information</h6>
+                        
+                        <!-- Personal Information -->
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name*</label>
+                            <input type="text" class="form-control" id="fullName" required>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email*</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" min="18" max="70">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender">
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Education Background -->
+                        <div class="mb-3">
+                            <label for="education" class="form-label">Highest Education*</label>
+                            <select class="form-select" id="education" required>
+                                <option value="">Select</option>
+                                <option value="High School">High School</option>
+                                <option value="Bachelor's Degree">Bachelor's Degree</option>
+                                <option value="Master's Degree">Master's Degree</option>
+                                <option value="PhD">PhD</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="institution" class="form-label">Institution Name</label>
+                            <input type="text" class="form-control" id="institution">
+                        </div>
+                        
+                        <!-- Professional Information -->
+                        <div class="mb-3">
+                            <label for="position" class="form-label">Position Applying For*</label>
+                            <select class="form-select" id="position" required>
+                                <option value="">Select</option>
+                                <option value="AI/ML Engineer">AI/ML Engineer</option>
+                                <option value="Software Engineer">Software Engineer</option>
+                                <option value="Data Scientist">Data Scientist</option>
+                                <option value="UI/UX Designer">UI/UX Designer</option>
+                                <option value="DevOps Engineer">DevOps Engineer</option>
+                                <option value="Product Manager">Product Manager</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="experience" class="form-label">Years of Experience*</label>
+                            <select class="form-select" id="experience" required>
+                                <option value="">Select</option>
+                                <option value="0-1">0-1 years</option>
+                                <option value="1-3">1-3 years</option>
+                                <option value="3-5">3-5 years</option>
+                                <option value="5+">5+ years</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="currentCompany" class="form-label">Current/Most Recent Company</label>
+                            <input type="text" class="form-control" id="currentCompany">
+                        </div>
+                        
+                        <!-- Additional Information -->
+                        <div class="mb-3">
+                            <label for="linkedin" class="form-label">LinkedIn Profile</label>
+                            <input type="url" class="form-control" id="linkedin">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="github" class="form-label">GitHub Profile</label>
+                            <input type="url" class="form-control" id="github">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="portfolio" class="form-label">Portfolio Website</label>
+                            <input type="url" class="form-control" id="portfolio">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="resume" class="form-label">Upload Resume/CV</label>
+                            <input type="file" class="form-control" id="resume" accept=".pdf,.docx">
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="consent" required>
+                            <label class="form-check-label" for="consent">I consent to this interview being recorded*</label>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" id="startInterviewBtn">
+                            <i class="fas fa-play me-2"></i> Start Interview
+                        </button>
+                    </div>
+                    
+                    <!-- Interview Panel -->
+                    <div id="interviewPanel" class="d-none">
+                        <div class="mb-4">
+                            <h6 class="sidebar-title">Interview Features</h6>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="voiceAnalysis" checked>
+                                <label class="form-check-label" for="voiceAnalysis">Voice Analysis</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="realTimeFeedback" checked>
+                                <label class="form-check-label" for="realTimeFeedback">Real-time Feedback</label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="sidebar-title">Quick Actions</h6>
+                            <button class="btn btn-sm btn-outline-primary mb-2 w-100" id="shareNotesBtn">
+                                <i class="fas fa-share-alt me-1"></i> Share Notes
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary mb-2 w-100" id="runCodeBtn">
+                                <i class="fas fa-code me-1"></i> Run Code
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary w-100" id="checklistBtn">
+                                <i class="fas fa-list-check me-1"></i> Checklist
+                            </button>
+                        </div>
+                        
+                        <div class="interview-progress mb-4">
+                            <h6 class="sidebar-title">Progress</h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar" role="progressbar" id="progressBar" style="width: 0%"></div>
+                            </div>
+                            <small id="progressText">0 of 10 questions completed</small>
+                        </div>
+                        
+                        <div class="candidate-info">
+                            <h6 class="sidebar-title">Candidate Info</h6>
+                            <div class="mb-2">
+                                <small class="text-muted">Name</small>
+                                <p id="candidateNameDisplay">Not set</p>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Position</small>
+                                <p id="jobPositionDisplay">Not set</p>
+                            </div>
+                            <div>
+                                <small class="text-muted">Experience</small>
+                                <p id="experienceDisplay">Not set</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-footer p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-info">Gemini</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary" id="settingsBtn">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Interview Area -->
+        <div class="col-md-9 main-content">
+            <div class="d-flex flex-column h-100">
+                <!-- Interview Header -->
+                <div class="interview-header p-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0" id="interviewTitle">Interview Session</h4>
+                        <div class="timer-container">
+                            <span class="badge bg-dark">
+                                <i class="fas fa-clock me-1"></i> <span id="timer">40:00</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Content Area -->
+                <div class="interview-body flex-grow-1 p-4">
+                    <!-- Welcome Screen -->
+                    <div id="welcomeScreen" class="h-100 d-flex flex-column justify-content-center align-items-center text-center">
+                        <div class="card shadow-sm" style="max-width: 600px;">
+                            <div class="card-body p-4">
+                                <h3 class="mb-4">Welcome to InterviewConnect</h3>
+                                <p class="mb-4">Please enter your details in the sidebar to begin your interview session.</p>
+                                <div class="text-muted">
+                                    <small>AI-powered interview assistant for technical roles</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Interview Screen -->
+                    <div id="interviewScreen" class="h-100 d-none">
+                        <div class="row h-100">
+                            <!-- Video Feed Column -->
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-video me-2"></i>Live Camera Feed</h5>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <video id="webcam" autoplay playsinline class="rounded shadow" width="100%"></video>
+                                        <div class="mt-3">
+                                            <button id="toggleCameraBtn" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-video-slash me-1"></i> Disable Camera
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Question Column -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Interview Question</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="question-container mb-3">
+                                            <div class="question-card">
+                                                <div class="question-header d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="badge bg-primary">Question</span>
+                                                    <div class="question-actions">
+                                                        <button class="btn btn-sm btn-outline-secondary" id="readQuestionBtn">
+                                                            <i class="fas fa-volume-up"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="question-content">
+                                                    <p id="currentQuestionText">Question will appear here</p>
+                                                </div>
+                                                <div class="question-footer">
+                                                    <small class="text-muted">Powered by Gemini</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="answer-container">
+                                            <div class="answer-card">
+                                                <div class="answer-header d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="badge bg-success">Your Response</span>
+                                                    <div class="answer-status">
+                                                        <span class="text-muted" id="answerStatus">Waiting for response...</span>
+                                                    </div>
+                                                </div>
+                                                <div class="answer-content">
+                                                    <textarea class="form-control border-0" id="answerInput" rows="4" placeholder="Type your answer or speak into the microphone..."></textarea>
+                                                </div>
+                                                <div class="answer-footer">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <button class="btn btn-sm btn-outline-primary me-1" id="voiceInputBtn">
+                                                                <i class="fas fa-microphone"></i> Voice
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-primary" id="keyboardInputBtn">
+                                                                <i class="fas fa-keyboard"></i> Type
+                                                            </button>
+                                                        </div>
+                                                        <button class="btn btn-primary" id="submitAnswerBtn" disabled>
+                                                            Submit <i class="fas fa-arrow-right ms-1"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Controls -->
+                <div class="interview-footer p-3 border-top d-none" id="navigationControls">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-outline-secondary" id="prevQuestionBtn" disabled>
+                            <i class="fas fa-arrow-left me-1"></i> Previous
+                        </button>
+                        <div class="question-counter">
+                            Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">10</span>
+                        </div>
+                        <button class="btn btn-primary" id="nextQuestionBtn">
+                            Next <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Question Feedback</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="feedbackContent">
+                <!-- Feedback will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // DOM Elements
+    const setupForm = document.getElementById('setupForm');
+    const interviewPanel = document.getElementById('interviewPanel');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const interviewScreen = document.getElementById('interviewScreen');
+    const navigationControls = document.getElementById('navigationControls');
+    
+    const webcam = document.getElementById('webcam');
+    const toggleCameraBtn = document.getElementById('toggleCameraBtn');
+    const voiceInputBtn = document.getElementById('voiceInputBtn');
+    const readQuestionBtn = document.getElementById('readQuestionBtn');
+    const answerInput = document.getElementById('answerInput');
+    const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+    const prevQuestionBtn = document.getElementById('prevQuestionBtn');
+    const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+    const currentQuestionText = document.getElementById('currentQuestionText');
+    const answerStatus = document.getElementById('answerStatus');
+    const timerElement = document.getElementById('timer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const currentQuestionNum = document.getElementById('currentQuestionNum');
+    const totalQuestions = document.getElementById('totalQuestions');
+    const candidateNameDisplay = document.getElementById('candidateNameDisplay');
+    const jobPositionDisplay = document.getElementById('jobPositionDisplay');
+    const experienceDisplay = document.getElementById('experienceDisplay');
+    const interviewTitle = document.getElementById('interviewTitle');
+    const startInterviewBtn = document.getElementById('startInterviewBtn');
+
+    // Interview state
+    let questions = [];
+    let answers = [];
+    let currentQuestionIndex = 0;
+    let timerInterval;
+    let questionTimeLeft = 40; // 40 seconds per question
+    let isCameraOn = false;
+    let isRecording = false;
+    let recognition;
+    let speechSynthesis = window.speechSynthesis;
+    let currentCandidate = {};
+
+    // Initialize the interview
+    async function initInterview() {
+        // Get candidate info from form
+        currentCandidate = {
+            fullName: document.getElementById('fullName').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            age: document.getElementById('age').value,
+            gender: document.getElementById('gender').value,
+            education: document.getElementById('education').value,
+            institution: document.getElementById('institution').value.trim(),
+            position: document.getElementById('position').value,
+            experience: document.getElementById('experience').value,
+            currentCompany: document.getElementById('currentCompany').value.trim(),
+            linkedin: document.getElementById('linkedin').value.trim(),
+            github: document.getElementById('github').value.trim(),
+            portfolio: document.getElementById('portfolio').value.trim(),
+            resume: document.getElementById('resume').files[0] || null
+        };
+
+        // Validate required fields
+        if (!currentCandidate.fullName || !currentCandidate.email || !currentCandidate.position || 
+            !currentCandidate.experience || !document.getElementById('consent').checked) {
+            alert('Please fill all required fields and give consent');
+            return;
+        }
+
+        // Update UI with candidate info
+        candidateNameDisplay.textContent = currentCandidate.fullName;
+        jobPositionDisplay.textContent = currentCandidate.position;
+        experienceDisplay.textContent = currentCandidate.experience;
+        interviewTitle.textContent = `${currentCandidate.position} Interview`;
+
+        try {
+            // Fetch questions from backend based on selected position
+            const response = await fetch(`/get-questions-from-backend?job_title=${encodeURIComponent(currentCandidate.position)}`);
+            const data = await response.json();
+            questions = data.questions || ["Tell me about yourself"];
+        } catch (error) {
+            console.error("Error fetching questions:", error);
+            questions = ["Tell me about yourself"];
+        }
+
+        answers = new Array(questions.length).fill('');
+        totalQuestions.textContent = questions.length;
+        
+        // Switch to interview view
+        setupForm.classList.add('d-none');
+        interviewPanel.classList.remove('d-none');
+        welcomeScreen.classList.add('d-none');
+        interviewScreen.classList.remove('d-none');
+        navigationControls.classList.remove('d-none');
+        
+        // Start with first question
+        showQuestion(0);
+        startQuestionTimer();
+        startCamera();
+        
+        // Automatically read the first question
+        setTimeout(readQuestion, 1000);
+    }
+
+    // Show question
+    function showQuestion(index) {
+        if (index >= questions.length) {
+            completeInterview();
+            return;
+        }
+        
+        currentQuestionIndex = index;
+        currentQuestionText.textContent = questions[index];
+        currentQuestionNum.textContent = index + 1;
+        answerInput.value = answers[index] || '';
+        submitAnswerBtn.disabled = !answers[index];
+        answerStatus.textContent = answers[index] ? 'Answer saved' : 'Waiting for response...';
+        
+        // Update navigation buttons
+        prevQuestionBtn.disabled = index === 0;
+        nextQuestionBtn.disabled = index === questions.length - 1;
+        
+        // Reset question timer
+        resetQuestionTimer();
+        
+        // Update progress
+        updateProgress();
+    }
+
+    // Timer functions
+    function resetQuestionTimer() {
+        clearInterval(timerInterval);
+        questionTimeLeft = 40;
+        updateQuestionTimerDisplay();
+    }
+
+    function startQuestionTimer() {
+        resetQuestionTimer();
+        timerInterval = setInterval(function() {
+            questionTimeLeft--;
+            updateQuestionTimerDisplay();
+            
+            if (questionTimeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = "Time's up!";
+            }
+        }, 1000);
+    }
+
+    function updateQuestionTimerDisplay() {
+        const minutes = Math.floor(questionTimeLeft / 60);
+        const seconds = questionTimeLeft % 60;
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (questionTimeLeft <= 5) {
+            timerElement.classList.add('text-danger');
+        } else {
+            timerElement.classList.remove('text-danger');
+        }
+    }
+
+    // Camera functions
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            webcam.srcObject = stream;
+            isCameraOn = true;
+            toggleCameraBtn.innerHTML = '<i class="fas fa-video-slash me-1"></i> Disable Camera';
+        } catch (err) {
+            console.error("Error accessing camera:", err);
+            alert("Could not access camera. Please check permissions.");
+        }
+    }
+
+    function stopCamera() {
+        if (webcam.srcObject) {
+            webcam.srcObject.getTracks().forEach(track => track.stop());
+            webcam.srcObject = null;
+            isCameraOn = false;
+            toggleCameraBtn.innerHTML = '<i class="fas fa-video me-1"></i> Enable Camera';
+        }
+    }
+
+    // Voice input
+    function startVoiceInput() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Voice input is not supported in your browser');
+            return;
+        }
+        
+        if (isRecording) {
+            stopVoiceInput();
+            return;
+        }
+        
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        
+        voiceInputBtn.innerHTML = '<i class="fas fa-microphone-slash me-1"></i> Stop';
+        answerStatus.innerHTML = '<span class="text-primary"><i class="fas fa-circle-notch fa-spin"></i> Listening...</span>';
+        isRecording = true;
+        
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            answerInput.value = transcript;
+            submitAnswerBtn.disabled = false;
+            answerStatus.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Voice input received</span>';
+        };
+        
+        recognition.onerror = function(event) {
+            answerStatus.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Error: ' + event.error + '</span>';
+            stopVoiceInput();
+        };
+        
+        recognition.onend = function() {
+            if (isRecording) {
+                recognition.start(); // Restart listening
+            }
+        };
+        
+        recognition.start();
+    }
+
+    function stopVoiceInput() {
+        if (recognition) {
+            recognition.stop();
+        }
+        isRecording = false;
+        voiceInputBtn.innerHTML = '<i class="fas fa-microphone me-1"></i> Voice';
+    }
+
+    // Read question aloud
+    function readQuestion() {
+        if (speechSynthesis) {
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(questions[currentQuestionIndex]);
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            const voices = speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => 
+                voice.name.includes('Google') || 
+                voice.name.includes('Natural') || 
+                voice.lang.includes('en-US')
+            );
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+            
+            speechSynthesis.speak(utterance);
+        }
+    }
+
+    // Navigation functions
+    function prevQuestion() {
+        saveCurrentAnswer();
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            showQuestion(currentQuestionIndex);
+            readQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        saveCurrentAnswer();
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            showQuestion(currentQuestionIndex);
+            readQuestion();
+        } else {
+            completeInterview();
+        }
+    }
+
+    function saveCurrentAnswer() {
+        answers[currentQuestionIndex] = answerInput.value.trim();
+        updateProgress();
+    }
+
+    function submitAnswer() {
+        saveCurrentAnswer();
+        nextQuestion();
+    }
+
+    function updateProgress() {
+        const answeredCount = answers.filter(answer => answer.trim() !== '').length;
+        const progressPercentage = (answeredCount / questions.length) * 100;
+        
+        progressBar.style.width = `${progressPercentage}%`;
+        progressText.textContent = `${answeredCount} of ${questions.length} questions completed`;
+    }
+
+    function completeInterview() {
+        clearInterval(timerInterval);
+        stopCamera();
+        stopVoiceInput();
+        
+        // Prepare interview data for submission
+        const interviewData = {
+            candidate: currentCandidate,
+            questions: questions.map((q, i) => ({
+                question: q,
+                answer: answers[i] || ""
+            })),
+            timestamp: new Date().toISOString(),
+            duration: (questions.length * 40) - questionTimeLeft
+        };
+        
+        console.log('Interview completed:', interviewData);
+        alert(`Interview completed! Thank you, ${currentCandidate.fullName}.`);
+        
+        // Reset the form for next candidate
+        resetInterview();
+    }
+
+    function resetInterview() {
+        document.getElementById('fullName').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('age').value = '';
+        document.getElementById('gender').value = '';
+        document.getElementById('education').value = '';
+        document.getElementById('institution').value = '';
+        document.getElementById('position').value = '';
+        document.getElementById('experience').value = '';
+        document.getElementById('currentCompany').value = '';
+        document.getElementById('linkedin').value = '';
+        document.getElementById('github').value = '';
+        document.getElementById('portfolio').value = '';
+        document.getElementById('resume').value = '';
+        document.getElementById('consent').checked = false;
+        
+        // Reset UI
+        setupForm.classList.remove('d-none');
+        interviewPanel.classList.add('d-none');
+        interviewScreen.classList.add('d-none');
+        navigationControls.classList.add('d-none');
+        welcomeScreen.classList.remove('d-none');
+    }
+
+    // Event listeners
+    toggleCameraBtn.addEventListener('click', function() {
+        if (isCameraOn) {
+            stopCamera();
+        } else {
+            startCamera();
+        }
+    });
+
+    voiceInputBtn.addEventListener('click', startVoiceInput);
+    readQuestionBtn.addEventListener('click', readQuestion);
+    prevQuestionBtn.addEventListener('click', prevQuestion);
+    nextQuestionBtn.addEventListener('click', nextQuestion);
+    submitAnswerBtn.addEventListener('click', submitAnswer);
+    startInterviewBtn.addEventListener('click', initInterview);
+    
+    answerInput.addEventListener('input', function() {
+        submitAnswerBtn.disabled = this.value.trim() === '';
+    });
+
+    // Initialize speech synthesis voices
+    if (speechSynthesis) {
+        speechSynthesis.onvoiceschanged = function() {
+            // Voices are now loaded
+        };
+    }
+});
+</script>
+
+<style>
+.interview-container {
+    height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.sidebar {
+    background-color: #2c3e50;
+    color: white;
+    height: 100vh;
+    border-right: 1px solid #dee2e6;
+}
+
+.sidebar-header {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-title {
+    color: #adb5bd;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-content {
+    overflow-y: auto;
+}
+
+.sidebar-footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.main-content {
+    background-color: white;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.interview-body {
+    background-color: #f8f9fa;
+}
+
+.question-card, .answer-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+.question-header, .answer-header {
+    padding-bottom: 0.5rem;
+}
+
+.question-content, .answer-content {
+    padding: 0.5rem 0;
+}
+
+.question-footer, .answer-footer {
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+}
+
+.answer-content textarea {
+    resize: none;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.answer-content textarea:focus {
+    background-color: white;
+    box-shadow: none;
+}
+
+.progress {
+    height: 6px;
+    background-color: rgba(255,255,255,0.1);
+}
+
+.progress-bar {
+    background-color: #4e73df;
+}
+
+.btn-outline-primary {
+    color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-outline-primary:hover {
+    background-color: #4e73df;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.badge.bg-primary {
+    background-color: #4e73df !important;
+}
+
+.badge.bg-success {
+    background-color: #1cc88a !important;
+}
+
+.badge.bg-info {
+    background-color: #36b9cc !important;
+}
+
+.badge.bg-dark {
+    background-color: #5a5c69 !important;
+}
+
+#webcam {
+    max-width: 100%;
+    border-radius: 6px;
+    background-color: #000;
+}
+
+.text-danger {
+    color: #e74a3b !important;
+}
+
+.text-primary {
+    color: #4e73df !important;
+}
+
+.text-success {
+    color: #1cc88a !important;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+}
+
+.form-control, .form-select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.35rem;
+    border: 1px solid #d1d3e2;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #bac8f3;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.required-field::after {
+    content: " *";
+    color: #e74a3b;
+}
+</style>
+{% endblock %}

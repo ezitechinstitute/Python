@@ -1,0 +1,1010 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow border-0" style="border-radius: 15px;">
+        <div class="card-header bg-primary text-white text-center rounded-top">
+            <h2 class="mb-0">AI Interview Assistant</h2>
+            <small class="opacity-75">Gemini Flash 2.5 | Resume + Job Title Based Questions</small>
+        </div>
+        <div class="card-body">
+            <!-- Job Title + Candidate Settings -->
+            <form id="job-form" class="row g-3 needs-validation" novalidate>
+                <div class="col-md-6">
+                    <label for="job_title" class="form-label">Internship Field*</label>
+                    <select id="job_title" class="form-select" required>
+                        <option value="" disabled selected>Select Field</option>
+                        <option value="AI/ML Engineer">AI/ML Engineer</option>
+                        <option value="Web Development">Web Development</option>
+                        <option value="Mobile App Development">Mobile App Development</option>
+                        <option value="DevOps Engineering">DevOps Engineering</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Blockchain Development">Blockchain Development</option>
+                        <option value="UI/UX Design">UI/UX Design</option>
+                        <option value="Quality Assurance">Quality Assurance</option>
+                        <option value="Cloud Computing">Cloud Computing</option>
+                        <option value="Cyber Security">Cyber Security</option>
+                        <option value="Digital Marketing">Digital Marketing</option>
+                        <option value="Business Analysis">Business Analysis</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a field</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="candidate_name" class="form-label">Candidate Name*</label>
+                    <input type="text" id="candidate_name" class="form-control" placeholder="e.g. Ali Khan" required>
+                    <div class="invalid-feedback">Please enter your name</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="language" class="form-label">Language*</label>
+                    <select id="language" class="form-select" required>
+                        <option value="en" selected>English</option>
+                        <option value="ur">Urdu</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="experience_level" class="form-label">Experience Level*</label>
+                    <select id="experience_level" class="form-select" required>
+                        <option value="entry">Entry (0-1 years)</option>
+                        <option value="mid" selected>Mid (1-3 years)</option>
+                        <option value="senior">Senior (3+ years)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="question_count" class="form-label">Questions Count*</label>
+                    <select id="question_count" class="form-select" required>
+                        <option value="5">5 Questions</option>
+                        <option value="10" selected>10 Questions</option>
+                        <option value="15">15 Questions</option>
+                        <option value="20">20 Questions</option>
+                    </select>
+                </div>
+                
+                <!-- Skill Assessment Section -->
+                <div class="col-12 mt-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="skill_assessment" checked>
+                        <label class="form-check-label" for="skill_assessment">
+                            Include technical skill assessment
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="behavioral_questions" checked>
+                        <label class="form-check-label" for="behavioral_questions">
+                            Include behavioral questions
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="scenario_based" checked>
+                        <label class="form-check-label" for="scenario_based">
+                            Include scenario-based questions
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="col-12 d-grid mt-2">
+                    <button type="submit" class="btn btn-primary" id="generate-btn">
+                        <span id="generate-btn-text">
+                            <i class="fas fa-robot me-2"></i>Generate Interview Questions
+                        </span>
+                        <span id="generate-btn-spinner" class="d-none">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Generating...
+                        </span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Resume Upload Section -->
+            <div class="mt-4">
+                <h5><i class="fas fa-file-upload me-2"></i>Upload Resume (PDF/DOCX)</h5>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Uploading a resume will generate tailored questions based on your experience
+                </div>
+                <input type="file" id="resume-upload" class="form-control mt-2" accept=".pdf,.docx">
+                <button id="generate-from-resume" class="btn btn-outline-primary mt-2 w-100">
+                    <span id="resume-btn-text">
+                        <i class="fas fa-magic me-2"></i>Generate Questions from Resume
+                    </span>
+                    <span id="resume-btn-spinner" class="d-none">
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Processing...
+                    </span>
+                </button>
+                <div class="alert alert-info d-none mt-3" id="resume-processing">
+                    <i class="fas fa-spinner fa-spin me-2"></i>Analyzing resume and generating questions...
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div id="question-section" class="mt-5 d-none">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4><i class="fas fa-list me-2"></i>Interview Questions</h4>
+                        <small class="text-muted" id="interview-field-display">Field: Not selected</small>
+                    </div>
+                    <div>
+                        <span class="badge bg-primary me-2" id="question-counter">Question 1 of 10</span>
+                        <span class="badge bg-danger" id="timer">20s</span>
+                    </div>
+                </div>
+                
+                <!-- Question Type Indicators -->
+                <div class="d-flex gap-2 my-2" id="question-type-indicators">
+                    <span class="badge bg-info d-none" id="technical-indicator">Technical</span>
+                    <span class="badge bg-warning text-dark d-none" id="behavioral-indicator">Behavioral</span>
+                    <span class="badge bg-success d-none" id="scenario-indicator">Scenario</span>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h5 id="current-question-text">Question will appear here</h5>
+                        
+                        <!-- Code Editor for Technical Questions -->
+                        <div class="card mt-3 d-none" id="code-editor-container">
+                            <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                                <small>Code Solution</small>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary" id="format-code">
+                                        <i class="fas fa-indent me-1"></i>Format
+                                    </button>
+                                    <button class="btn btn-outline-secondary" id="run-code">
+                                        <i class="fas fa-play me-1"></i>Run
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <textarea class="form-control border-0" id="code-editor" rows="5" placeholder="Write your code here..."></textarea>
+                                <div id="code-output" class="p-2 bg-dark text-white d-none"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Regular Answer Field -->
+                        <textarea class="form-control answer-field mt-3" rows="5" placeholder="Your answer..." id="current-answer"></textarea>
+                        
+                        <div class="mt-3 d-flex justify-content-between">
+                            <div>
+                                <button class="btn btn-outline-success mic-btn me-2" id="mic-btn">
+                                    <i class="fas fa-microphone"></i> Voice Answer
+                                </button>
+                                <button class="btn btn-outline-primary speak-btn me-2" id="speak-btn">
+                                    <i class="fas fa-volume-up"></i> Read Question
+                                </button>
+                                <button class="btn btn-outline-dark get-feedback-btn" id="feedback-btn">
+                                    <i class="fas fa-comments"></i> Get Feedback
+                                </button>
+                            </div>
+                            <button class="btn btn-primary" id="next-question-btn" disabled>
+                                Next Question <i class="fas fa-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid mt-3">
+                    <button id="submit-log" class="btn btn-success d-none">
+                        <i class="fas fa-paper-plane me-1"></i>Submit Interview Log
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div id="summary-section" class="mt-5 d-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4><i class="fas fa-clipboard-list me-2"></i>Interview Summary</h4>
+                    <div>
+                        <button id="back-to-questions" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-edit me-1"></i>Edit Answers
+                        </button>
+                        <button id="download-summary" class="btn btn-outline-secondary">
+                            <i class="fas fa-download me-1"></i> Download PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Candidate Information</h5>
+                                <p><strong>Name:</strong> <span id="summary-name">Not provided</span></p>
+                                <p><strong>Field:</strong> <span id="summary-field">Not selected</span></p>
+                                <p><strong>Experience Level:</strong> <span id="summary-experience">Not specified</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Performance Metrics</h5>
+                                <div class="progress mb-2" style="height: 20px;">
+                                    <div class="progress-bar bg-success" id="completion-progress" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small>Questions completed: <span id="completed-count">0</span>/<span id="total-count">0</span></small>
+                                <div class="mt-2">
+                                    <span class="badge bg-primary me-2" id="time-taken">Time: 0m 0s</span>
+                                    <span class="badge bg-info" id="score-badge">Score: Calculating...</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="summary-content"></div>
+                        
+                        <div class="mt-4">
+                            <h5>Overall Feedback</h5>
+                            <div class="alert alert-light" id="overall-feedback">
+                                Complete the interview to receive overall feedback.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid mt-3">
+                            <button id="final-submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane me-1"></i>Final Submit to Ezitech
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Detailed Feedback</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="feedback-content">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Technical Evaluation</h6>
+                        <div class="mb-3">
+                            <small>Accuracy: <span id="accuracy-value">0</span>%</small>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" id="accuracy-meter" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <small>Depth: <span id="depth-value">0</span>%</small>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-info" id="depth-meter" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Communication Skills</h6>
+                        <div class="mb-3">
+                            <small>Clarity: <span id="clarity-value">0</span>%</small>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-warning" id="clarity-meter" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <small>Structure: <span id="structure-value">0</span>%</small>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-primary" id="structure-meter" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h6>Detailed Analysis</h6>
+                <div id="detailed-feedback-text" class="mb-3"></div>
+                <h6>Suggestions for Improvement</h6>
+                <div id="improvement-suggestions" class="mb-3"></div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <small>This feedback is generated by AI and should be used as guidance only</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-feedback-btn">
+                    <i class="fas fa-save me-1"></i> Save Feedback
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="confirmation-title">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmation-message">
+                Are you sure you want to proceed?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" id="confirm-action">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mic-btn, .speak-btn {
+        min-width: 120px;
+    }
+    #timer {
+        font-size: 1rem;
+        padding: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .summary-question {
+        font-weight: bold;
+        margin-top: 1rem;
+        border-left: 3px solid #4e73df;
+        padding-left: 10px;
+    }
+    .summary-answer {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+        border-left: 3px solid #1cc88a;
+    }
+    .technical-question {
+        background-color: rgba(78, 115, 223, 0.1);
+    }
+    .behavioral-question {
+        background-color: rgba(254, 200, 75, 0.1);
+    }
+    .scenario-question {
+        background-color: rgba(28, 200, 138, 0.1);
+    }
+    #code-editor {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    #code-output {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        font-size: 14px;
+        max-height: 150px;
+        overflow-y: auto;
+    }
+    .question-type-badge {
+        font-size: 0.75rem;
+    }
+    .was-validated .form-control:invalid, 
+    .was-validated .form-select:invalid {
+        border-color: #dc3545;
+    }
+    .was-validated .form-control:valid, 
+    .was-validated .form-select:valid {
+        border-color: #198754;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-html.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Initialize modals
+    const feedbackModal = new bootstrap.Modal(document.getElementById("feedbackModal"));
+    const confirmationModal = new bootstrap.Modal(document.getElementById("confirmationModal"));
+    
+    // Interview state variables
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let timerInterval;
+    let timeLeft = 20;
+    let interviewStartTime;
+    let interviewData = {
+        candidate: {},
+        responses: [],
+        startTime: null,
+        endTime: null,
+        feedback: []
+    };
+
+    // Form validation
+    const jobForm = document.getElementById("job-form");
+    jobForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        if (!jobForm.checkValidity()) {
+            e.stopPropagation();
+            jobForm.classList.add("was-validated");
+            return;
+        }
+
+        await generateQuestions();
+    });
+
+    // Generate questions from form
+            async function generateQuestions() {
+                const job = document.getElementById("job_title").value;
+                const lang = document.getElementById("language").value;
+                const level = document.getElementById("experience_level").value;
+                const count = document.getElementById("question_count").value;
+                const includeTechnical = document.getElementById("skill_assessment").checked;
+                const includeBehavioral = document.getElementById("behavioral_questions").checked;
+                const includeScenario = document.getElementById("scenario_based").checked;
+
+                // Store candidate info
+                interviewData.candidate = {
+                    name: document.getElementById("candidate_name").value.trim(),
+                    field: job,
+                    experienceLevel: level,
+                    language: lang
+                };
+
+                try {
+                    // Show loading state
+                    toggleLoadingState(true);
+                    
+                    const response = await axios.post("/questions/generate", {
+                        job_title: job,
+                        language: lang,
+                        experience_level: level,
+                        count: count,
+                        include_technical: includeTechnical,
+                        include_behavioral: includeBehavioral,
+                        include_scenario: includeScenario
+                    });
+
+                    if (response.data.status === "error") {
+                        throw new Error(response.data.message);
+                    }
+
+                    questions = response.data.questions.map(q => ({ 
+                        ...q,
+                        answer: "",
+                        feedback: null
+                    }));
+                    
+                    document.getElementById("interview-field-display").textContent = `Field: ${job}`;
+                    startInterview();
+                } catch (error) {
+                    console.error("Question generation error:", error);
+                    showError("Failed to generate questions. Please try again.");
+                } finally {
+                    toggleLoadingState(false);
+                }
+            }
+
+    // Generate questions from resume
+            document.getElementById("generate-from-resume").addEventListener("click", async () => {
+                const fileInput = document.getElementById("resume-upload");
+                if (!fileInput.files.length) {
+                    showError("Please upload a resume file first.");
+                    return;
+                }
+
+                try {
+                    // Show loading state
+                    document.getElementById("resume-processing").classList.remove("d-none");
+                    document.getElementById("resume-btn-text").classList.add("d-none");
+                    document.getElementById("resume-btn-spinner").classList.remove("d-none");
+                    
+                    const formData = new FormData();
+                    formData.append("resume", fileInput.files[0]);
+                    formData.append("job_title", document.getElementById("job_title").value);
+                    formData.append("language", document.getElementById("language").value);
+                    formData.append("experience_level", document.getElementById("experience_level").value);
+                    formData.append("count", document.getElementById("question_count").value);
+                    formData.append("technical", document.getElementById("skill_assessment").checked);
+                    formData.append("behavioral", document.getElementById("behavioral_questions").checked);
+                    formData.append("scenario", document.getElementById("scenario_based").checked);
+
+                    const response = await axios.post("/resume/upload", formData, {
+                        headers: { "Content-Type": "multipart/form-data" }
+                    });
+
+                    // After resume processing, generate questions
+                    await generateQuestions();
+                } catch (error) {
+                    console.error("Resume processing error:", error);
+                    showError("Failed to process resume. Please try again.");
+                } finally {
+                    document.getElementById("resume-processing").classList.add("d-none");
+                    document.getElementById("resume-btn-text").classList.remove("d-none");
+                    document.getElementById("resume-btn-spinner").classList.add("d-none");
+                }
+            });
+    // Start the interview
+    function startInterview() {
+        document.getElementById("question-section").classList.remove("d-none");
+        document.getElementById("summary-section").classList.add("d-none");
+        currentQuestionIndex = 0;
+        interviewData.startTime = new Date();
+        interviewData.responses = [];
+        showQuestion(currentQuestionIndex);
+        startTimer();
+    }
+
+    // Show current question
+    function showQuestion(index) {
+        if (index >= questions.length) {
+            completeInterview();
+            return;
+        }
+
+        const question = questions[index];
+        document.getElementById("question-counter").textContent = `Question ${index + 1} of ${questions.length}`;
+        document.getElementById("current-question-text").textContent = question.question;
+        document.getElementById("current-answer").value = question.answer || "";
+        
+        // Reset code editor
+        document.getElementById("code-editor").value = question.codeAnswer || "";
+        document.getElementById("code-output").classList.add("d-none");
+        
+        // Show/hide appropriate answer field
+        const codeEditor = document.getElementById("code-editor-container");
+        if (question.type === 'technical' && question.question.toLowerCase().includes('code')) {
+            codeEditor.classList.remove("d-none");
+            document.getElementById("current-answer").classList.add("d-none");
+        } else {
+            codeEditor.classList.add("d-none");
+            document.getElementById("current-answer").classList.remove("d-none");
+        }
+        
+        // Update question type indicators
+        document.querySelectorAll('#question-type-indicators .badge').forEach(badge => {
+            badge.classList.add('d-none');
+        });
+        document.getElementById(`${question.type}-indicator`).classList.remove('d-none');
+        
+        // Reset timer and enable/disable next button
+        resetTimer();
+        updateNextButtonState();
+    }
+
+    // Timer functions
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById("timer").textContent = "Time's up!";
+                document.getElementById("timer").classList.add("bg-danger");
+                setTimeout(() => moveToNextQuestion(), 1500);
+            }
+        }, 1000);
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        timeLeft = 20;
+        updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+        document.getElementById("timer").textContent = `${timeLeft}s`;
+        if (timeLeft <= 5) {
+            document.getElementById("timer").classList.add("bg-warning", "text-dark");
+            document.getElementById("timer").classList.remove("bg-danger");
+        } else {
+            document.getElementById("timer").classList.remove("bg-warning", "text-dark", "bg-danger");
+        }
+    }
+
+    // Navigation functions
+    function moveToNextQuestion() {
+        saveCurrentAnswer();
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            showQuestion(currentQuestionIndex);
+        } else {
+            completeInterview();
+        }
+    }
+
+    function saveCurrentAnswer() {
+        const currentQuestion = questions[currentQuestionIndex];
+        
+        if (document.getElementById("code-editor-container").classList.contains("d-none")) {
+            currentQuestion.answer = document.getElementById("current-answer").value.trim();
+            currentQuestion.codeAnswer = "";
+        } else {
+            currentQuestion.codeAnswer = document.getElementById("code-editor").value.trim();
+            currentQuestion.answer = "";
+        }
+        
+        // Update interview data
+        interviewData.responses = questions.filter(q => q.answer.trim() !== "" || q.codeAnswer.trim() !== "");
+    }
+
+    function updateNextButtonState() {
+        const currentQuestion = questions[currentQuestionIndex];
+        const hasAnswer = currentQuestion.answer.trim() !== "" || 
+                         currentQuestion.codeAnswer.trim() !== "";
+        document.getElementById("next-question-btn").disabled = !hasAnswer;
+    }
+
+    // Complete interview and show summary
+    function completeInterview() {
+        clearInterval(timerInterval);
+        interviewData.endTime = new Date();
+        
+        document.getElementById("question-section").classList.add("d-none");
+        document.getElementById("summary-section").classList.remove("d-none");
+        
+        // Update summary info
+        document.getElementById("summary-name").textContent = interviewData.candidate.name;
+        document.getElementById("summary-field").textContent = interviewData.candidate.field;
+        document.getElementById("summary-experience").textContent = 
+            interviewData.candidate.experienceLevel.charAt(0).toUpperCase() + 
+            interviewData.candidate.experienceLevel.slice(1);
+        
+        // Calculate completion metrics
+        const completedCount = interviewData.responses.length;
+        const totalCount = questions.length;
+        document.getElementById("completed-count").textContent = completedCount;
+        document.getElementById("total-count").textContent = totalCount;
+        
+        const completionPercentage = Math.round((completedCount / totalCount) * 100);
+        document.getElementById("completion-progress").style.width = `${completionPercentage}%`;
+        
+        // Calculate time taken
+        const timeTaken = Math.round((interviewData.endTime - interviewData.startTime) / 1000);
+        const minutes = Math.floor(timeTaken / 60);
+        const seconds = timeTaken % 60;
+        document.getElementById("time-taken").textContent = `Time: ${minutes}m ${seconds}s`;
+        
+        // Generate summary content
+        generateSummaryContent();
+        
+        // Generate overall feedback
+        generateOverallFeedback();
+    }
+
+    // Generate summary content HTML
+    function generateSummaryContent() {
+        let summaryHTML = "";
+        questions.forEach((q, index) => {
+            const questionClass = q.type === 'technical' ? 'technical-question' : 
+                                q.type === 'behavioral' ? 'behavioral-question' : 'scenario-question';
+            
+            const answerContent = q.answer || q.codeAnswer || "<i>No answer provided</i>";
+            
+            summaryHTML += `
+                <div class="summary-question ${questionClass}">
+                    Q${index + 1}. ${q.question}
+                    <span class="badge question-type-badge bg-${q.type === 'technical' ? 'info' : 
+                        q.type === 'behavioral' ? 'warning text-dark' : 'success'} float-end">
+                        ${q.type.charAt(0).toUpperCase() + q.type.slice(1)}
+                    </span>
+                </div>
+                <div class="summary-answer">
+                    ${answerContent}
+                    ${q.feedback ? `<div class="mt-2 p-2 bg-light rounded">${q.feedback}</div>` : ''}
+                </div>
+            `;
+        });
+        
+        document.getElementById("summary-content").innerHTML = summaryHTML;
+    }
+
+    // Generate overall feedback
+    async function generateOverallFeedback() {
+        try {
+            // Simulate API call
+            document.getElementById("overall-feedback").innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Generating feedback...</p>
+                </div>
+            `;
+            
+            // In a real app, this would be an API call:
+            // const response = await axios.post("/api/generate-feedback", interviewData);
+            
+            // Simulated response
+            setTimeout(() => {
+                document.getElementById("overall-feedback").innerHTML = `
+                    <h6>Strengths:</h6>
+                    <ul>
+                        <li>Strong technical knowledge in ${interviewData.candidate.field}</li>
+                        <li>Clear communication style</li>
+                        <li>Good problem-solving approach</li>
+                    </ul>
+                    <h6>Areas for Improvement:</h6>
+                    <ul>
+                        <li>Could provide more detailed examples</li>
+                        <li>Work on structuring answers more clearly</li>
+                    </ul>
+                    <h6>Recommendation:</h6>
+                    <p>Overall strong candidate with good potential. Recommended for next round.</p>
+                    <div class="alert alert-info mt-2">
+                        <i class="fas fa-info-circle"></i> This feedback is AI-generated and should be reviewed by a human
+                    </div>
+                `;
+                
+                // Update score badge
+                document.getElementById("score-badge").textContent = "Score: 8/10";
+                document.getElementById("score-badge").classList.add("bg-success");
+            }, 2000);
+        } catch (error) {
+            console.error("Feedback generation error:", error);
+            document.getElementById("overall-feedback").innerHTML = `
+                <div class="alert alert-danger">
+                    Could not generate automated feedback. Please review answers manually.
+                </div>
+            `;
+        }
+    }
+
+    // Event listeners
+    document.getElementById("next-question-btn").addEventListener("click", moveToNextQuestion);
+    
+    document.getElementById("current-answer").addEventListener("input", function() {
+        updateNextButtonState();
+    });
+    
+    document.getElementById("code-editor").addEventListener("input", function() {
+        updateNextButtonState();
+    });
+
+    // Format code button
+    document.getElementById("format-code").addEventListener("click", function() {
+        const editor = document.getElementById("code-editor");
+        const language = document.getElementById("language").value;
+        
+        try {
+            if (language === 'en') {
+                editor.value = js_beautify(editor.value);
+            }
+            // Add other language formatters as needed
+        } catch (error) {
+            console.error("Code formatting error:", error);
+        }
+    });
+
+    // Run code button (simulated)
+    document.getElementById("run-code").addEventListener("click", function() {
+        const output = document.getElementById("code-output");
+        output.classList.remove("d-none");
+        output.innerHTML = "<div class='text-success'>Code executed successfully!</div>";
+        
+        // In a real app, this would call a code execution API
+    });
+
+    // Speak question button
+    document.getElementById("speak-btn").addEventListener("click", async function() {
+        const text = document.getElementById("current-question-text").textContent;
+        const lang = document.getElementById("language").value;
+        
+        try {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang === 'ur' ? 'ur-PK' : 'en-US';
+                window.speechSynthesis.speak(utterance);
+            } else {
+                throw new Error("Speech synthesis not supported");
+            }
+        } catch (error) {
+            console.error("Text-to-speech error:", error);
+            showError("Could not read question aloud");
+        }
+    });
+
+    // Voice answer button
+    document.getElementById("mic-btn").addEventListener("click", function() {
+        if (!('webkitSpeechRecognition' in window)) {
+            showError("Voice input not supported in your browser");
+            return;
+        }
+
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = document.getElementById("language").value === "ur" ? "ur-PK" : "en-US";
+        recognition.interimResults = false;
+        
+        recognition.onstart = () => {
+            document.getElementById("mic-btn").innerHTML = '<i class="fas fa-microphone-slash"></i> Listening...';
+        };
+        
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            const answerField = document.getElementById("current-answer").classList.contains("d-none") ? 
+                document.getElementById("code-editor") : document.getElementById("current-answer");
+            answerField.value = transcript;
+            updateNextButtonState();
+        };
+        
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+            showError("Voice input failed: " + event.error);
+        };
+        
+        recognition.onend = () => {
+            document.getElementById("mic-btn").innerHTML = '<i class="fas fa-microphone"></i> Voice Answer';
+        };
+        
+        recognition.start();
+    });
+
+    // Feedback button
+    document.getElementById("feedback-btn").addEventListener("click", async function() {
+        const question = document.getElementById("current-question-text").textContent;
+        let answer = document.getElementById("current-answer").classList.contains("d-none") ? 
+            document.getElementById("code-editor").value : document.getElementById("current-answer").value;
+        
+        if (!answer.trim()) {
+            showError("Please provide an answer before getting feedback.");
+            return;
+        }
+
+        try {
+            // Show loading state
+            document.getElementById("feedback-btn").innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Analyzing...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Update feedback meters
+                document.getElementById("accuracy-meter").style.width = "85%";
+                document.getElementById("accuracy-value").textContent = "85";
+                document.getElementById("depth-meter").style.width = "72%";
+                document.getElementById("depth-value").textContent = "72";
+                document.getElementById("clarity-meter").style.width = "68%";
+                document.getElementById("clarity-value").textContent = "68";
+                document.getElementById("structure-meter").style.width = "79%";
+                document.getElementById("structure-value").textContent = "79";
+                
+                // Update feedback text
+                document.getElementById("detailed-feedback-text").innerHTML = `
+                    <p>Your answer demonstrates good understanding of the concept, but could benefit from:</p>
+                    <ul>
+                        <li>More specific examples</li>
+                        <li>Clearer structure in your explanation</li>
+                    </ul>
+                `;
+                
+                document.getElementById("improvement-suggestions").innerHTML = `
+                    <ul>
+                        <li>Try using the STAR method (Situation, Task, Action, Result) for behavioral questions</li>
+                        <li>For technical questions, start with a high-level overview before diving into details</li>
+                    </ul>
+                `;
+                
+                // Save feedback to question
+                questions[currentQuestionIndex].feedback = `
+                    <div class="feedback-item">
+                        <strong>Accuracy:</strong> 85% <br>
+                        <strong>Depth:</strong> 72% <br>
+                        <strong>Suggestions:</strong> Use more examples, structure your answer better
+                    </div>
+                `;
+                
+                // Show modal
+                feedbackModal.show();
+                document.getElementById("feedback-btn").innerHTML = '<i class="fas fa-comments"></i> Get Feedback';
+            }, 1500);
+        } catch (error) {
+            console.error("Feedback error:", error);
+            showError("Could not get feedback at this time");
+            document.getElementById("feedback-btn").innerHTML = '<i class="fas fa-comments"></i> Get Feedback';
+        }
+    });
+
+    // Save feedback button
+    document.getElementById("save-feedback-btn").addEventListener("click", function() {
+        feedbackModal.hide();
+        showSuccess("Feedback saved successfully");
+    });
+
+    // Back to questions button
+    document.getElementById("back-to-questions").addEventListener("click", function() {
+        document.getElementById("summary-section").classList.add("d-none");
+        document.getElementById("question-section").classList.remove("d-none");
+    });
+
+    // Download summary as PDF
+    document.getElementById("download-summary").addEventListener("click", async function() {
+        try {
+            // Show loading state
+            const btn = document.getElementById("download-summary");
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Generating PDF...';
+            btn.disabled = true;
+            
+            // Simulate PDF generation
+            setTimeout(() => {
+                // In a real app, this would download the actual PDF
+                showSuccess("PDF downloaded successfully");
+                btn.innerHTML = '<i class="fas fa-download me-1"></i> Download PDF';
+                btn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            showError("Failed to generate PDF");
+            document.getElementById("download-summary").innerHTML = '<i class="fas fa-download me-1"></i> Download PDF';
+            document.getElementById("download-summary").disabled = false;
+        }
+    });
+
+    // Final submit button
+    document.getElementById("final-submit").addEventListener("click", function() {
+        // Show confirmation dialog
+        document.getElementById("confirmation-title").textContent = "Submit Interview";
+        document.getElementById("confirmation-message").innerHTML = `
+            <p>Are you sure you want to submit your interview to Ezitech?</p>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> This action cannot be undone
+            </div>
+        `;
+        
+        document.getElementById("confirm-action").onclick = async function() {
+            confirmationModal.hide();
+            
+            try {
+                document.getElementById("final-submit").innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Submitting...';
+                
+                // Simulate API call
+                setTimeout(() => {
+                    showSuccess("Interview submitted successfully!");
+                    document.getElementById("final-submit").innerHTML = '<i class="fas fa-check me-1"></i> Submitted';
+                    document.getElementById("final-submit").disabled = true;
+                    
+                    // Redirect after delay
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 2000);
+                }, 1500);
+            } catch (error) {
+                console.error("Submission error:", error);
+                showError("Failed to submit interview");
+                document.getElementById("final-submit").innerHTML = '<i class="fas fa-paper-plane me-1"></i> Final Submit';
+            }
+        };
+        
+        confirmationModal.show();
+    });
+
+    // Helper functions
+    function toggleLoadingState(show) {
+        if (show) {
+            document.getElementById("generate-btn-text").classList.add("d-none");
+            document.getElementById("generate-btn-spinner").classList.remove("d-none");
+            document.getElementById("generate-btn").disabled = true;
+        } else {
+            document.getElementById("generate-btn-text").classList.remove("d-none");
+            document.getElementById("generate-btn-spinner").classList.add("d-none");
+            document.getElementById("generate-btn").disabled = false;
+        }
+    }
+
+    function showError(message) {
+        const alertDiv = document.createElement("div");
+        alertDiv.className = "alert alert-danger alert-dismissible fade show mt-3";
+        alertDiv.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const container = document.querySelector(".container.py-4");
+        container.prepend(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.classList.add("show");
+        }, 10);
+    }
+
+    function showSuccess(message) {
+        const alertDiv = document.createElement("div");
+        alertDiv.className = "alert alert-success alert-dismissible fade show mt-3";
+        alertDiv.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const container = document.querySelector(".container.py-4");
+        container.prepend(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.classList.add("show");
+        }, 10);
+    }
+});
+</script>
+{% endblock %}

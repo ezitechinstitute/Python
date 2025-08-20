@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">📋 Submitted Interview Logs</h2>
+
+    {% if logs %}
+        <ul class="list-group">
+            {% for log in logs %}
+                <li class="list-group-item">
+                    <h6>{{ log.filename }}</h6>
+                    <pre style="white-space: pre-wrap;">{{ log.content }}</pre>
+                    <a class="btn btn-sm btn-success" href="/admin/logs/download/{{ log.filename }}">⬇️ Download CSV</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No logs available yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

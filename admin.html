@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - Ezitech Robot</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      display: flex;
+      min-height: 100vh;
+      background-color: #f4f6f9;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #111;
+      color: white;
+      padding: 30px 15px;
+    }
+
+    .sidebar h3 {
+      margin-bottom: 40px;
+    }
+
+    .sidebar a {
+      color: #ccc;
+      text-decoration: none;
+      display: block;
+      margin: 15px 0;
+    }
+
+    .sidebar a:hover {
+      color: #00d9ff;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding: 30px;
+    }
+
+    .card {
+      background: white;
+      border: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .table th, .table td {
+      vertical-align: middle;
+    }
+
+    body.light-mode {
+      background-color: #f8f9fa;
+      color: #212529;
+    }
+
+    body.light-mode .card {
+      background-color: white;
+      color: #212529;
+    }
+
+    body.light-mode .table {
+      color: #212529;
+    }
+
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+
+    body.dark-mode .card {
+      background-color: #1e1e1e;
+      color: white;
+    }
+
+    body.dark-mode .table {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h3>Admin Panel</h3>
+    <a href="/admin">Dashboard</a>
+    <a href="/resume/upload">User Resumes</a>
+    <a href="/interview/interview/questions?job_title=Data%20Analysis">Interview Qs</a>
+    <a href="/emotion/video-feed">Live Emotions</a>
+    <a href="/">Back to Home</a>
+
+    <nav class="sidebar">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/interviews">Interview Logs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/contact">Contact Messages</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Welcome Admin</h2>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="themeToggle">
+        <label class="form-check-label" for="themeToggle">Dark Mode</label>
+      </div>
+    </div>
+
+    <h2 class="mb-4">Dashboard Overview</h2>
+    
+    <div class="row">
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <h5>Total Users</h5>
+          <h3>{{ total_users }}</h3>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <h5>Resumes Uploaded</h5>
+          <h3>{{ total_resumes }}</h3>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <h5>Interviews Taken</h5>
+          <h3>{{ total_interviews }}</h3>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <h5>Emotion Sessions</h5>
+          <h3>{{ total_emotions }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-3">
+      <h5>User Activity Table</h5>
+      <div class="mb-4">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email...">
+      </div>
+
+      <div class="d-flex justify-content-end mb-3">
+        <a href="/admin/download-csv" class="btn btn-outline-success">
+          📥 Download CSV
+        </a>
+      </div>
+
+      <table class="table table-dark table-striped" id="userTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Resume Uploaded</th>
+            <th>Interview Taken</th>
+            <th>Last Active</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.resume }}</td>
+            <td>{{ user.interview }}</td>
+            <td>{{ user.last_active }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row mt-5">
+      <div class="col-md-4">
+        <canvas id="resumeChart"></canvas>
+      </div>
+      <div class="col-md-4">
+        <canvas id="interviewChart"></canvas>
+      </div>
+      <div class="col-md-4">
+        <canvas id="emotionChart"></canvas>
+      </div>
+    </div>
+
+    <a href="/admin/logs" class="btn btn-outline-dark mt-3">📋 View Interview Logs</a>
+
+  </div>
+
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const tableRows = document.querySelectorAll("#userTable tbody tr");
+
+    searchInput.addEventListener("keyup", function () {
+      const filter = searchInput.value.toLowerCase();
+      tableRows.forEach(row => {
+        const name = row.cells[1].innerText.toLowerCase();
+        const email = row.cells[2].innerText.toLowerCase();
+        if (name.includes(filter) || email.includes(filter)) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    });
+
+    // Example Data (replace with dynamic data later if needed)
+    const resumeData = {{ resume_counts | safe }};
+    const interviewData = {{ interview_counts | safe }};
+    const emotionData = {{ emotion_counts | safe }};
+
+    new Chart(document.getElementById('resumeChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Uploaded', 'Not Uploaded'],
+        datasets: [{
+          data: [resumeData.uploaded, resumeData.not_uploaded],
+          backgroundColor: ['#00c9a7', '#888']
+        }]
+      },
+      options: {
+        plugins: { title: { display: true, text: 'Resume Uploads' } }
+      }
+    });
+
+    new Chart(document.getElementById('interviewChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Taken', 'Pending'],
+        datasets: [{
+          label: 'Interviews',
+          data: [interviewData.taken, interviewData.pending],
+          backgroundColor: ['#4bc0c0', '#bbb']
+        }]
+      },
+      options: {
+        plugins: { title: { display: true, text: 'Interview Stats' } }
+      }
+    });
+
+    new Chart(document.getElementById('emotionChart'), {
+      type: 'line',
+      data: {
+        labels: emotionData.labels,
+        datasets: [{
+          label: 'Emotions Tracked',
+          data: emotionData.values,
+          fill: false,
+          borderColor: '#ff6384',
+          tension: 0.1
+        }]
+      },
+      options: {
+        plugins: { title: { display: true, text: 'Emotion Sessions' } }
+      }
+    });
+
+    const toggle = document.getElementById('themeToggle');
+    const body = document.body;
+
+    // Load saved mode
+    if (localStorage.getItem("theme") === "light") {
+      body.classList.add("light-mode");
+      toggle.checked = false;
+    } else {
+      body.classList.add("dark-mode");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener('change', () => {
+      if (toggle.checked) {
+        body.classList.remove("light-mode");
+        body.classList.add("dark-mode");
+        localStorage.setItem("theme", "dark");
+      } else {
+        body.classList.remove("dark-mode");
+        body.classList.add("light-mode");
+        localStorage.setItem("theme", "light");
+      }
+    });
+  </script>
+</body>
+</html>
+{% endblock %}
